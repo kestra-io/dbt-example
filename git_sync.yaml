@@ -3,7 +3,6 @@ namespace: company.myteam
 tasks:
   - id: git
     type: io.kestra.plugin.git.SyncNamespaceFiles
-    gitDirectory: dbt
+    gitDirectory: .
     url: https://github.com/kestra-io/dbt-example
     branch: main
-    username: anna-geller
