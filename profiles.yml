@@ -1,6 +1,12 @@
 my_dbt_project:
   outputs:
     dev:
-      type: duckdb
-      path: ":memory:"
+      type: postgres
+      host: host.docker.internal
+      user: kestra
+      password: k3str4
+      port: 5432
+      dbname: kestra
+      schema: public
+      connect_timeout: 10
   target: dev

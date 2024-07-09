@@ -1,0 +1,42 @@
+id: generate_dbt_flow
+namespace: company.myteam
+
+inputs:
+  - id: dbt_flow_id
+    type: STRING
+    description: Name for the dbt flow to be created
+    defaults: dbt_flow
+
+  - id: dbt_flow_namespace
+    type: STRING
+    description: Namespace in which the dbt flow should be created
+    defaults: company.myteam
+
+tasks:
+  - id: create_kestra_flow
+    type: io.kestra.plugin.scripts.python.Commands
+    env:
+      DBT_FLOW_ID: "{{ inputs.dbt_flow_id }}"
+      DBT_FLOW_NAMESPACE: "{{ inputs.dbt_flow_namespace }}"
+    outputFiles:
+      - "*.yaml"
+    beforeCommands:
+      - pip install -q ruamel.yaml dbt-duckdb
+    namespaceFiles:
+      enabled: true
+    commands:
+      - python dbt_to_kestra.py
+
+  - id: create_flow
+    type: io.kestra.plugin.scripts.shell.Commands
+    inputFiles:
+      flow.yaml: "{{ outputs.create_kestra_flow.outputFiles['kestra_flow.yaml'] }}"
+    commands:
+      - curl -X POST http://host.docker.internal:8080/api/v1/flows/import -F fileUpload=@flow.yaml
+
+pluginDefaults:
+  - type: io.kestra.plugin.scripts
+    forced: true
+    values:
+      taskRunner:
+        type: io.kestra.plugin.core.runner.Process
