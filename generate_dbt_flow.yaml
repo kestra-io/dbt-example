@@ -21,7 +21,7 @@ tasks:
     outputFiles:
       - "*.yaml"
     beforeCommands:
-      - pip install -q ruamel.yaml dbt-duckdb
+      - pip install -q ruamel.yaml dbt-postgres
     namespaceFiles:
       enabled: true
     commands:
