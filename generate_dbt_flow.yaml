@@ -32,11 +32,12 @@ tasks:
     inputFiles:
       flow.yaml: "{{ outputs.create_kestra_flow.outputFiles['kestra_flow.yaml'] }}"
     commands:
-      - curl -X POST http://host.docker.internal:8080/api/v1/flows/import -F fileUpload=@flow.yaml
+      - curl -X POST http://localhost:8080/api/v1/flows/import -F fileUpload=@flow.yaml
 
 pluginDefaults:
   - type: io.kestra.plugin.scripts
     forced: true
     values:
+      warningOnStdErr: false
       taskRunner:
         type: io.kestra.plugin.core.runner.Process

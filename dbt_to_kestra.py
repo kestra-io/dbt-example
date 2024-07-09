@@ -1,6 +1,5 @@
 import json
 import subprocess
-import requests
 import os
 from ruamel.yaml import YAML
 
@@ -60,11 +59,35 @@ kestra_flow = {
     ]
 }
 
+# Add pluginDefaults with a preceding newline
+plugin_defaults = {
+    "pluginDefaults": [
+        {
+            "type": "io.kestra.plugin.dbt.cli.DbtCLI",
+            "forced": True,
+            "values": {
+                "warningOnStdErr": False,
+                "beforeCommands": [
+                    "pip install -q dbt-postgres"
+                ],
+                "namespaceFiles": {
+                    "enabled": True
+                },
+                "taskRunner": {
+                    "type": "io.kestra.plugin.core.runner.Process"
+                }
+            }
+        }
+    ]
+}
+
 yaml = YAML()
 yaml.indent(mapping=2, sequence=4, offset=2)
 
 output_path = "kestra_flow.yaml"
 with open(output_path, "w") as f:
     yaml.dump(kestra_flow, f)
+    f.write("\n")
+    yaml.dump(plugin_defaults, f)
 
 print(f"Kestra flow YAML has been generated and saved to {output_path}")
