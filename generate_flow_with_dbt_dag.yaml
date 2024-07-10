@@ -7,11 +7,6 @@ inputs:
     description: Name for the dbt flow to be created
     defaults: new_dbt_flow
 
-  - id: dbt_flow_namespace
-    type: STRING
-    description: Namespace in which the dbt flow should be created
-    defaults: company
-
   - id: dbt_repository_url
     type: STRING
     description: Your dbt repository (we assume it has the dbt project at the root level)
@@ -30,6 +25,7 @@ inputs:
 tasks:
   - id: git
     type: io.kestra.plugin.git.SyncNamespaceFiles
+    namespace: "{{ flow.namespace }}"
     gitDirectory: .
     url: "{{ inputs.dbt_repository_url }}"
     branch: "{{ inputs.dbt_repository_branch }}"
@@ -42,7 +38,7 @@ tasks:
     type: io.kestra.plugin.scripts.python.Commands
     env:
       DBT_FLOW_ID: "{{ inputs.dbt_flow_id }}"
-      DBT_FLOW_NAMESPACE: "{{ inputs.dbt_flow_namespace }}"
+      DBT_FLOW_NAMESPACE: "{{ flow.namespace }}"
     beforeCommands: # change dbt-duckdb to match your dbt adapter ✅
       - pip install -q ruamel.yaml dbt-duckdb
     namespaceFiles:
@@ -60,7 +56,7 @@ tasks:
       flow.yaml: "{{ outputs.create_kestra_flow.outputFiles['kestra_flow.yaml'] }}"
     commands:
       - curl -X POST http://{{inputs.kestra_host}}/api/v1/flows/import -F fileUpload=@flow.yaml
-      - echo "Execute the flow from http://{{inputs.kestra_host}}/ui/flows/edit/{{ inputs.dbt_flow_namespace }}/{{ inputs.dbt_flow_id }}"
+      - echo "Execute the flow from http://{{inputs.kestra_host}}/ui/flows/edit/{{ flow.namespace }}/{{ inputs.dbt_flow_id }}"
 
 pluginDefaults:
   - type: io.kestra.plugin.scripts
