@@ -76,6 +76,7 @@ plugin_defaults = {
             "forced": True,
             "values": {
                 "warningOnStdErr": False,
+                "parseRunResults": False,
                 "beforeCommands": [
                     f"pip install -q {adapter}"
                 ],

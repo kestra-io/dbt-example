@@ -1,11 +1,11 @@
 id: generate_flow_with_dbt_dag
-namespace: company.dbt
+namespace: company.datateam.dbt
 
 inputs:
   - id: dbt_flow_id
     type: STRING
     description: Name for the dbt flow to be created
-    defaults: a_new_dbt_flow
+    defaults: dbt_flow
 
   - id: dbt_repository_url
     type: STRING
