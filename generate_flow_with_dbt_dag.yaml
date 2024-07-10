@@ -1,5 +1,5 @@
 id: generate_flow_with_dbt_dag
-namespace: company
+namespace: company.dbt
 
 inputs:
   - id: dbt_flow_id
@@ -17,6 +17,20 @@ inputs:
     description: Your dbt repository's branch
     defaults: main
 
+  - id: dbt_adapter
+    type: ENUM
+    description: The pip package of your dbt adapter
+    defaults: dbt-postgres
+    values:
+      - dbt-postgres
+      - dbt-snowflake
+      - dbt-bigquery
+      - dbt-redshift
+      - dbt-synapse
+      - dbt-databricks
+      - dbt-dremio
+      - dbt-athena-community
+
   - id: kestra_host
     type: STRING
     description: Your Kestra hostname
@@ -25,6 +39,7 @@ inputs:
 tasks:
   - id: git
     type: io.kestra.plugin.git.SyncNamespaceFiles
+    delete: true
     namespace: "{{ flow.namespace }}"
     gitDirectory: .
     url: "{{ inputs.dbt_repository_url }}"
@@ -39,8 +54,9 @@ tasks:
     env:
       DBT_FLOW_ID: "{{ inputs.dbt_flow_id }}"
       DBT_FLOW_NAMESPACE: "{{ flow.namespace }}"
-    beforeCommands: # change dbt-duckdb to match your dbt adapter ✅
-      - pip install -q ruamel.yaml dbt-duckdb
+      DBT_ADAPTER: "{{ inputs.dbt_adapter }}"
+    beforeCommands: 
+      - pip install -q ruamel.yaml "{{ inputs.dbt_adapter }}"
     namespaceFiles:
       enabled: true # required to access your dbt project synced from GitHub to your Namespace
     inputFiles:

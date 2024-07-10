@@ -68,6 +68,7 @@ kestra_flow = {
 }
 
 # Add pluginDefaults with a preceding newline
+adapter = os.getenv('DBT_ADAPTER', "dbt-postgres")
 plugin_defaults = {
     "pluginDefaults": [
         {
@@ -76,7 +77,7 @@ plugin_defaults = {
             "values": {
                 "warningOnStdErr": False,
                 "beforeCommands": [
-                    "pip install -q dbt-postgres"
+                    f"pip install -q {adapter}"
                 ],
                 "namespaceFiles": {
                     "enabled": True

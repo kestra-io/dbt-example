@@ -1,8 +1,0 @@
-id: git_sync
-namespace: company.myteam
-tasks:
-  - id: git
-    type: io.kestra.plugin.git.SyncNamespaceFiles
-    gitDirectory: .
-    url: https://github.com/kestra-io/dbt-example
-    branch: main
