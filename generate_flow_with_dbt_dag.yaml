@@ -5,7 +5,7 @@ inputs:
   - id: dbt_flow_id
     type: STRING
     description: Name for the dbt flow to be created
-    defaults: new_dbt_flow
+    defaults: a_new_dbt_flow
 
   - id: dbt_repository_url
     type: STRING
@@ -56,7 +56,14 @@ tasks:
       flow.yaml: "{{ outputs.create_kestra_flow.outputFiles['kestra_flow.yaml'] }}"
     commands:
       - curl -X POST http://{{inputs.kestra_host}}/api/v1/flows/import -F fileUpload=@flow.yaml
-      - echo "Execute the flow from http://{{inputs.kestra_host}}/ui/flows/edit/{{ flow.namespace }}/{{ inputs.dbt_flow_id }}"
+      - echo "Executing the flow from http://{{inputs.kestra_host}}/ui/flows/edit/{{ flow.namespace }}/{{ inputs.dbt_flow_id }}"
+  
+  - id: subflow
+    type: io.kestra.plugin.core.flow.Subflow
+    namespace: "{{ flow.namespace }}"
+    flowId: "{{ inputs.dbt_flow_id }}"
+    wait: true
+    transmitFailed: true
 
 pluginDefaults:
   - type: io.kestra.plugin.scripts
