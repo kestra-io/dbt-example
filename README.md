@@ -21,6 +21,9 @@ The `curl` commands will deploy and run flows that:
 
 ![kestra](kestra/flow_topology.png)
 
-## Note
+## Limitations
 
-Note that DuckDB adapter is currently not supported as Kestra runs each dbt task in a stateless manner so sharing the same DuckDB database across dbt tasks is not supported using this approach. For DuckDB, try [this blueprint](https://kestra.io/blueprints/git/50-git-workflow-for-dbt-with-duckdb) instead.
+Kestra runs tasks in a stateless manner. Your dbt models and tests executed with the approach presented here cannot share a working directory. Therefore:
+1. You cannot use the DuckDB adapter (unless you use MotherDuck). For local DuckDB, try [this blueprint](https://kestra.io/blueprints/git/50-git-workflow-for-dbt-with-duckdb) instead.
+2. If you use some dbt packackages, you need to either use the `Process` task runner or add `dbt deps` before each dbt command.
+

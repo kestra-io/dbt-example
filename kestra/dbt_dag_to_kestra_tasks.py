@@ -52,6 +52,14 @@ kestra_flow = {
     "namespace": os.getenv('DBT_FLOW_NAMESPACE', "company.myteam"),
     "tasks": [
         {
+            "id": "seed_deps",
+            "type": "io.kestra.plugin.dbt.cli.DbtCLI",
+            "commands": [
+                "dbt seed",
+                "dbt deps"
+            ]
+        },
+        {
             "id": "dag",
             "type": "io.kestra.plugin.core.flow.Dag",
             "tasks": kestra_tasks
