@@ -16,9 +16,11 @@ Try running the following commands:
 
 ```bash
 docker-compose up -d
+sleep 60 # wait a minute for the containers to start
 curl -X POST http://localhost:8080/api/v1/flows/import -F fileUpload=@git_sync.yaml
 curl -X POST http://localhost:8080/api/v1/flows/import -F fileUpload=@generate_dbt_flow.yaml
 curl -X POST http://localhost:8080/api/v1/executions/company.myteam/git_sync?wait=true
 curl -X POST http://localhost:8080/api/v1/executions/company.myteam/generate_dbt_flow?wait=true
+curl -X POST http://localhost:8080/api/v1/executions/company.myteam/dbt_flow?wait=true
 ```
 
