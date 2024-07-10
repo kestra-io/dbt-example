@@ -25,7 +25,7 @@ tasks:
     namespaceFiles:
       enabled: true
     commands:
-      - python dbt_to_kestra.py
+      - python kestra/dbt_dag_to_kestra_tasks.py
 
   - id: create_flow
     type: io.kestra.plugin.scripts.shell.Commands
