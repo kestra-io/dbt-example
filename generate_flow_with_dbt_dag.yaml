@@ -1,0 +1,71 @@
+id: generate_flow_with_dbt_dag
+namespace: company
+
+inputs:
+  - id: dbt_flow_id
+    type: STRING
+    description: Name for the dbt flow to be created
+    defaults: new_dbt_flow
+
+  - id: dbt_flow_namespace
+    type: STRING
+    description: Namespace in which the dbt flow should be created
+    defaults: company
+
+  - id: dbt_repository_url
+    type: STRING
+    description: Your dbt repository (we assume it has the dbt project at the root level)
+    defaults: https://github.com/kestra-io/dbt-demo
+
+  - id: dbt_repository_branch
+    type: STRING
+    description: Your dbt repository's branch
+    defaults: main
+
+  - id: kestra_host
+    type: STRING
+    description: Your Kestra hostname
+    defaults: "localhost:8080"
+
+tasks:
+  - id: git
+    type: io.kestra.plugin.git.SyncNamespaceFiles
+    gitDirectory: .
+    url: "{{ inputs.dbt_repository_url }}"
+    branch: "{{ inputs.dbt_repository_branch }}"
+
+  - id: get_code
+    type: io.kestra.plugin.core.http.Download
+    uri: https://raw.githubusercontent.com/kestra-io/dbt-example/main/kestra/dbt_dag_to_kestra_tasks.py
+
+  - id: create_kestra_flow
+    type: io.kestra.plugin.scripts.python.Commands
+    env:
+      DBT_FLOW_ID: "{{ inputs.dbt_flow_id }}"
+      DBT_FLOW_NAMESPACE: "{{ inputs.dbt_flow_namespace }}"
+    beforeCommands: # change dbt-duckdb to match your dbt adapter ✅
+      - pip install -q ruamel.yaml dbt-duckdb
+    namespaceFiles:
+      enabled: true # required to access your dbt project synced from GitHub to your Namespace
+    inputFiles:
+      script.py: "{{ outputs.get_code.uri }}"
+    commands:
+      - python script.py
+    outputFiles:
+      - "*.yaml"
+
+  - id: create_flow
+    type: io.kestra.plugin.scripts.shell.Commands
+    inputFiles:
+      flow.yaml: "{{ outputs.create_kestra_flow.outputFiles['kestra_flow.yaml'] }}"
+    commands:
+      - curl -X POST http://{{inputs.kestra_host}}/api/v1/flows/import -F fileUpload=@flow.yaml
+      - echo "Execute the flow from http://{{inputs.kestra_host}}/ui/flows/edit/{{ inputs.dbt_flow_namespace }}/{{ inputs.dbt_flow_id }}"
+
+pluginDefaults:
+  - type: io.kestra.plugin.scripts
+    forced: true
+    values:
+      warningOnStdErr: false
+      taskRunner:
+        type: io.kestra.plugin.core.runner.Process
