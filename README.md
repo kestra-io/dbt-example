@@ -9,7 +9,7 @@ To spin up Kestra in Docker (including Postgres database), use the following com
 docker-compose up -d
 sleep 60 # wait a minute for the containers to start
 curl -X POST http://localhost:8080/api/v1/flows/import -F fileUpload=@generate_flow_with_dbt_dag.yaml
-curl -X POST http://localhost:8080/api/v1/executions/company.myteam/generate_flow_with_dbt_dag?wait=true
+curl -X POST http://localhost:8080/api/v1/executions/company.datateam.dbt/generate_flow_with_dbt_dag?wait=true
 ```
 
 The `curl` commands will deploy and run flows that:

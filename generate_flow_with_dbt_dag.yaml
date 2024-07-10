@@ -10,7 +10,7 @@ inputs:
   - id: dbt_repository_url
     type: STRING
     description: Your dbt repository (we assume it has the dbt project at the root level)
-    defaults: https://github.com/kestra-io/dbt-demo
+    defaults: https://github.com/kestra-io/dbt-example
 
   - id: dbt_repository_branch
     type: STRING
