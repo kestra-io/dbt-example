@@ -1,5 +1,5 @@
 id: generate_flow_with_dbt_dag
-namespace: company.datateam.dbt
+namespace: company.team
 
 inputs:
   - id: dbt_flow_id
@@ -15,12 +15,12 @@ inputs:
   - id: dbt_repository_branch
     type: STRING
     description: Your dbt repository's branch
-    defaults: main
+    defaults: demo
 
   - id: dbt_adapter
-    type: ENUM
+    type: SELECT
     description: The pip package of your dbt adapter
-    defaults: dbt-postgres
+    defaults: dbt-bigquery
     values:
       - dbt-postgres
       - dbt-snowflake

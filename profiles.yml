@@ -1,12 +1,14 @@
-my_dbt_project:
+bigquery:
   outputs:
-    dev:
-      type: postgres
-      host: host.docker.internal
-      user: kestra
-      password: k3str4
-      port: 5432
-      dbname: kestra
-      schema: public
-      connect_timeout: 10
-  target: dev
+    prod:
+      type: bigquery
+      dataset: "{% raw %}{{ env_var('DBT_SCHEMA', 'dwh') }}{% endraw %}"
+      project: "{% raw %}{{ env_var('DBT_DATABASE', 'geller') }}{% endraw %}"
+      keyfile: "{% raw %}{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', 'sa.json') }}{% endraw %}"
+      location: EU
+      method: service-account
+      priority: interactive
+      threads: 16
+      timeout_seconds: 300
+      fixed_retries: 1
+  target: prod
