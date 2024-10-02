@@ -2,9 +2,9 @@ bigquery:
   outputs:
     prod:
       type: bigquery
-      dataset: "{% raw %}{{ env_var('DBT_SCHEMA', 'dwh') }}{% endraw %}"
-      project: "{% raw %}{{ env_var('DBT_DATABASE', 'geller') }}{% endraw %}"
-      keyfile: "{% raw %}{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', 'sa.json') }}{% endraw %}"
+      dataset: "{{ env_var('DBT_SCHEMA', 'dwh') }}"
+      project: "{{ env_var('DBT_DATABASE', 'geller') }}"
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', 'sa.json') }}"
       location: EU
       method: service-account
       priority: interactive
