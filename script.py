@@ -17,13 +17,13 @@ with open(manifest_path) as f:
 # Step 4: Extract models and their dependencies from the manifest
 nodes = manifest["nodes"]
 models = {k: v for k, v in nodes.items() if v["resource_type"] == "model"}
-tests = {k: v for k, v in nodes.items() if v["resource_type"] == "test"}
 
 # Step 5: Generate Kestra tasks
 kestra_tasks = []
 
-def create_kestra_task(node_id, node, command_type):
-    dbt_command = f"dbt {command_type} --models {node['name']}"
+def create_kestra_task(node_id, node):
+    # Run `dbt deps` before each `dbt run` to ensure dependencies are installed
+    dbt_command = f"dbt deps && dbt run --models {node['name']}"
     task = {
         "id": node["name"],
         "type": "io.kestra.plugin.dbt.cli.DbtCLI",
@@ -31,35 +31,39 @@ def create_kestra_task(node_id, node, command_type):
     }
     return task
 
-# Add model tasks
+# Add model tasks (each task will first run `dbt deps` before `dbt run`)
 for node_id, node in models.items():
-    task = create_kestra_task(node_id, node, "run")
+    task = create_kestra_task(node_id, node)
     task_entry = {"task": task}
     depends_on = [dep.split(".")[-1] for dep in node["depends_on"]["nodes"] if dep in models]
     if depends_on:
         task_entry["dependsOn"] = depends_on
     kestra_tasks.append(task_entry)
 
-# Add test tasks
-for node_id, node in tests.items():
-    task = create_kestra_task(node_id, node, "test")
-    task_entry = {"task": task}
-    depends_on = [dep.split(".")[-1] for dep in node["depends_on"]["nodes"] if dep in models]
-    if depends_on:
-        task_entry["dependsOn"] = depends_on
-    kestra_tasks.append(task_entry)
+# Step 6: Add a single `dbt test` task for the entire project, to be executed after all models are run
+dbt_test_task = {
+    "id": "dbt_test",
+    "type": "io.kestra.plugin.dbt.cli.DbtCLI",
+    "commands": ["dbt test"]
+}
 
-# Step 6: Generate the Kestra flow YAML with the correct order and indentation
+# Ensure `dbt test` runs after all model runs are completed
+kestra_tasks.append({
+    "task": dbt_test_task,
+    "dependsOn": [task['task']['id'] for task in kestra_tasks]  # Depends on all model tasks
+})
+
+# Step 7: Generate the Kestra flow YAML with the correct order and indentation
 kestra_flow = {
     "id": os.getenv('DBT_FLOW_ID', "dbt_flow"),
     "namespace": os.getenv('DBT_FLOW_NAMESPACE', "company.myteam"),
     "tasks": [
         {
-            "id": "seed_deps",
+            "id": "deps_seed",
             "type": "io.kestra.plugin.dbt.cli.DbtCLI",
             "commands": [
-                "dbt seed",
-                "dbt deps"
+                "dbt deps",  # Make sure dbt deps runs before dbt seed
+                "dbt seed"
             ]
         },
         {
