@@ -6,7 +6,7 @@ A lightweight sample dbt project building dbt models in the same Postgres databa
 To spin up Kestra in Docker (including Postgres database), use the following commands:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 sleep 60 # wait a minute for the containers to start
 curl -X POST http://localhost:8080/api/v1/flows/import -F fileUpload=@generate_flow_with_dbt_dag.yaml
 curl -X POST http://localhost:8080/api/v1/executions/company.datateam.dbt/generate_flow_with_dbt_dag?wait=true
