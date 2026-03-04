@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Staged customer data"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    description: "Staged order data"
+    columns:
+      - name: order_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_payments
+    description: "Staged payment data"
+    columns:
+      - name: payment_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null

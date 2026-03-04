@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: int_customer_orders
+    description: "Customers joined with their orders"
+
+  - name: int_order_payments
+    description: "Orders joined with their payments"
+
+  - name: int_daily_revenue
+    description: "Daily revenue aggregation from completed orders"

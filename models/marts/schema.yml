@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: fct_customer_summary
+    description: "Customer-level summary with order and payment metrics"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_revenue_by_customer
+    description: "Revenue analysis per customer with average order value"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null
